@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: sftp-demo
+
+sftp:
+  server:
+    username: foo
+    password: bar
+    address: 192.168.1.74
+    port: 2222
+
+
