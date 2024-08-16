@@ -1,5 +1,7 @@
 package be.codesolutions.sftp_demo.config;
 
+import be.codesolutions.sftp_demo.service.FileService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +20,7 @@ import java.io.File;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 public class SftpConfig {
 
     @Value("${sftp.server.username}")
@@ -31,6 +34,8 @@ public class SftpConfig {
 
     @Value("${sftp.server.port}")
     private int port;
+
+    private final FileService fileService;
 
 
     public DefaultSftpSessionFactory sftpSessionFactory() {
@@ -66,15 +71,11 @@ public class SftpConfig {
     /*
      * Async incoming file handler
      */
-    @Async
     @ServiceActivator(inputChannel = "fileuploaded")
+    @Async("singleThreadExecutor")
+//    @Async
     public void handleIncomingFile(File file) {
         log.info("Received file: {}", file.getName());
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        log.info("Done handling file: {}", file.getName());
+        fileService.handleFile(file);
     }
 }
